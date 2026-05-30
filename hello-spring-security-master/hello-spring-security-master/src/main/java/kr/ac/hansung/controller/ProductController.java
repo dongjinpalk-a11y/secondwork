@@ -1,5 +1,6 @@
 package kr.ac.hansung.controller;
 
+import jakarta.validation.Valid;
 import kr.ac.hansung.dto.ProductDto;
 import kr.ac.hansung.entity.Product;
 import kr.ac.hansung.service.ProductService;
@@ -69,6 +70,42 @@ public class ProductController {
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable Long id) {
         productService.deleteById(id);
+        return "redirect:/products";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String editProductForm(@PathVariable Long id, Model model) {
+        Product product=productService.findById(id);
+
+        ProductDto dto=new ProductDto();
+        dto.setName(product.getName());
+        dto.setPrice(product.getPrice());
+        dto.setStock(product.getStock());
+        dto.setDescription(product.getDescription());
+
+        model.addAttribute("productDto",dto);
+        model.addAttribute("productId",id);
+
+        return "products/edit";
+    }
+    @PostMapping("/{id}/edit")
+    public String editProduct(@PathVariable Long id,
+                              @Valid @ModelAttribute("productDto") ProductDto productDto,
+                              org.springframework.validation.BindingResult bindingResult,
+                              Model model,
+                              org.springframework.web.servlet.mvc.support.RedirectAttributes ra) {
+
+        // 검증 에러가 있는 경우 수정 폼으로 다시 리턴
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("productId", id);
+            return "products/edit";
+        }
+
+        productService.updateProduct(id, productDto);
+
+        // 목록 화면에서 띄워줄 성공 알림 메시지 등록
+        ra.addFlashAttribute("successMessage", "상품이 성공적으로 수정되었습니다.");
+
         return "redirect:/products";
     }
 }

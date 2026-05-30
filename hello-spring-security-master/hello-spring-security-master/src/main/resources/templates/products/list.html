@@ -111,6 +111,7 @@
                         <td class="text-center text-muted small"
                             th:text="${#temporals.format(p.createdAt, 'yyyy-MM-dd')}"></td>
                         <td class="text-center" sec:authorize="hasRole('ADMIN')">
+                            <a th:href="@{/products/{id}/edit(id=${p.id})}" class="btn btn-outline-warning btn-sm mb-1">수정</a>
                             <form th:action="@{/products/{id}/delete(id=${p.id})}" method="post"
                                   onsubmit="return confirm('삭제하시겠습니까?')">
                                 <button class="btn btn-outline-danger btn-sm">삭제</button>

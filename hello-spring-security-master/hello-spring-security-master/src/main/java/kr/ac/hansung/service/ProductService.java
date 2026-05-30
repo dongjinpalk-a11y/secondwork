@@ -34,12 +34,28 @@ public class ProductService {
                 .orElseThrow(() -> new NoSuchElementException("상품을 찾을 수 없습니다: " + id));
     }
 
+
+
     @Transactional
     public Product save(ProductDto dto) {
         Product product = new Product(
                 dto.getName(), dto.getPrice(), dto.getDescription(), dto.getStock()
         );
         return productRepository.save(product);
+    }
+
+    @Transactional
+    public Product updateProduct(Long id, ProductDto dto) {
+        Product product=productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다: "+ id));
+
+        product.setName(dto.getName());
+        product.setPrice(dto.getPrice());
+        product.setStock(dto.getStock());
+        if(dto.getDescription() != null) {
+            product.setDescription(dto.getDescription());
+        }
+        return product;
     }
 
     @Transactional
