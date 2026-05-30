@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<!--
+    productEditForm.html - 상품 수정 폼
+    productForm.html(등록)과 거의 동일하지만 다음이 다릅니다:
+      1. 제목: "상품 수정"
+      2. form action: /products/{id}/edit
+      3. 뒤로가기: 상품 상세 페이지
+      4. 버튼: "수정 완료"
+-->
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="|'${productForm.name}' 수정 - Product Management|">상품 수정</title>
+    <style>
+        body { font-family: 'Malgun Gothic', Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; color: #333; }
+        h1 { border-bottom: 2px solid #e67e22; padding-bottom: 10px; color: #2c3e50; }
+        .back-btn { display: inline-block; padding: 8px 16px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px; margin-bottom: 24px; }
+        .back-btn:hover { background: #545b62; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 6px; color: #495057; }
+        input[type="text"], input[type="number"], textarea, select {
+            width: 100%; padding: 10px 12px; border: 1px solid #ced4da;
+            border-radius: 4px; font-size: 1em; box-sizing: border-box;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none; border-color: #e67e22; box-shadow: 0 0 0 3px rgba(230,126,34,0.15);
+        }
+        /* 검증 오류 스타일 */
+        .field-error { border-color: #e74c3c !important; }
+        .error-msg { color: #e74c3c; font-size: 0.85em; margin-top: 5px; display: block; }
+        textarea { height: 120px; resize: vertical; }
+        .btn-submit { background: #e67e22; color: white; border: none; padding: 12px 32px; font-size: 1em; border-radius: 4px; cursor: pointer; }
+        .btn-submit:hover { background: #ca6f1e; }
+        .hint { font-size: 0.85em; color: #6c757d; margin-top: 4px; }
+        .required { color: #e74c3c; }
+        .editing-badge { display: inline-block; background: #e67e22; color: white; padding: 3px 10px; border-radius: 12px; font-size: 0.8em; margin-left: 8px; vertical-align: middle; }
+    </style>
+</head>
+<body>
+
+    <h1>
+        상품 수정
+        <span class="editing-badge" th:text="'ID: #' + ${productForm.id}">ID: #1</span>
+    </h1>
+
+    <!--
+        th:href: 상세 페이지 URL을 동적으로 생성합니다.
+        @{/products/{id}(id=${productForm.id})} → /products/1, /products/2 등
+    -->
+    <a class="back-btn" th:href="@{/products/{id}(id=${productForm.id})}">← 상세 페이지로 돌아가기</a>
+
+    <!--
+        수정 폼:
+          - th:action에 {id}를 경로 변수로 사용합니다.
+          - th:object로 productForm을 바인딩합니다.
+
+        [오류 재표시 흐름]
+        1. 사용자가 수정 폼 제출 (POST /products/{id}/edit)
+        2. @Valid 검증 실패 → bindingResult에 오류 저장
+        3. 컨트롤러가 "productEditForm" 뷰 이름 반환
+        4. Spring MVC가 productForm (오류 포함)을 Model에 자동 포함
+        5. Thymeleaf가 th:errors로 오류 메시지 렌더링
+        6. th:classappend로 오류 필드에 빨간 테두리 적용
+    -->
+    <form th:action="@{/products/{id}/edit(id=${productForm.id})}"
+          th:object="${productForm}"
+          method="post">
+
+        <div class="form-group">
+            <label for="name">
+                상품명 <span class="required">*</span>
+            </label>
+            <!--
+                th:classappend:
+                  - 조건에 따라 CSS 클래스를 추가합니다.
+                  - #fields.hasErrors('name'): 'name' 필드에 검증 오류가 있으면 true
+                  - 오류가 있을 때 "field-error" 클래스 추가 → 빨간 테두리
+            -->
+            <input type="text"
+                   th:field="*{name}"
+                   th:classappend="${#fields.hasErrors('name')} ? 'field-error'"
+                   placeholder="상품명을 입력하세요" />
+            <!--
+                th:errors="*{name}":
+                  - 'name' 필드의 모든 검증 오류 메시지를 표시합니다.
+                  - 복수 오류는 <br>로 구분됩니다.
+                  - 오류가 없으면 이 요소는 렌더링되지 않습니다.
+            -->
+            <span class="error-msg" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">이름 오류</span>
+        </div>
+
+        <div class="form-group">
+            <label for="category">카테고리</label>
+            <select th:field="*{category}">
+                <option value="">-- 카테고리 선택 --</option>
+                <option value="전자제품">전자제품</option>
+                <option value="식품">식품</option>
+                <option value="의류">의류</option>
+                <option value="도서">도서</option>
+                <option value="스포츠">스포츠</option>
+                <option value="가구">가구</option>
+                <option value="기타">기타</option>
+            </select>
+            <span class="error-msg" th:if="${#fields.hasErrors('category')}" th:errors="*{category}">카테고리 오류</span>
+        </div>
+
+        <div class="form-group">
+            <label for="price">
+                가격 <span class="required">*</span>
+            </label>
+            <input type="number"
+                   th:field="*{price}"
+                   th:classappend="${#fields.hasErrors('price')} ? 'field-error'"
+                   placeholder="0"
+                   min="0"
+                   step="100" />
+            <span class="error-msg" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">가격 오류</span>
+            <p class="hint">단위: 원(KRW). 100원 단위로 입력하세요.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="description">상품 설명</label>
+            <textarea th:field="*{description}"
+                      th:classappend="${#fields.hasErrors('description')} ? 'field-error'"
+                      placeholder="상품에 대한 설명을 입력하세요..."></textarea>
+            <span class="error-msg" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">설명 오류</span>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn-submit">수정 완료</button>
+        </div>
+
+    </form>
+
+</body>
+</html>

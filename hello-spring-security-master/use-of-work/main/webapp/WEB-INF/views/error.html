@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<!--
+    error.html - 전역 예외 처리 페이지
+    GlobalExceptionHandler의 각 @ExceptionHandler 메서드가
+    이 뷰를 반환합니다.
+
+    Model에 담기는 데이터:
+      errorCode    : HTTP 상태 코드 문자열 (예: "404", "400", "500")
+      errorTitle   : 사람이 읽기 좋은 오류 제목
+      errorMessage : 오류 내용 요약
+      errorDetail  : 사용자에게 안내할 상세 내용
+-->
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="|오류 ${errorCode} - Product Management|">오류 발생</title>
+    <style>
+        body { font-family: 'Malgun Gothic', Arial, sans-serif; max-width: 700px; margin: 80px auto; padding: 0 20px; color: #333; text-align: center; }
+        .error-icon { font-size: 5em; margin-bottom: 16px; }
+        .error-code { font-size: 4em; font-weight: bold; color: #e74c3c; margin: 0; line-height: 1; }
+        .error-title { font-size: 1.6em; color: #2c3e50; margin: 12px 0 24px; }
+        .error-box { background: #fff5f5; border: 1px solid #f5c6cb; border-radius: 8px; padding: 20px 28px; margin: 24px 0; text-align: left; }
+        .error-box p { margin: 8px 0; line-height: 1.7; }
+        .error-label { font-weight: bold; color: #c0392b; }
+        .btn { display: inline-block; padding: 10px 24px; background: #4a90d9; color: white; text-decoration: none; border-radius: 4px; margin-top: 8px; }
+        .btn:hover { background: #357abd; }
+        .btn-gray { background: #6c757d; }
+        .btn-gray:hover { background: #545b62; }
+    </style>
+</head>
+<body>
+
+    <div class="error-icon">⚠️</div>
+
+    <!--
+        th:text: Model에 담긴 errorCode를 표시합니다.
+        GlobalExceptionHandler에서 model.addAttribute("errorCode", "404") 등으로 설정합니다.
+    -->
+    <p class="error-code" th:text="${errorCode}">500</p>
+    <h1 class="error-title" th:text="${errorTitle}">오류가 발생했습니다</h1>
+
+    <div class="error-box">
+        <!--
+            th:if: errorMessage가 있을 때만 해당 단락을 표시합니다.
+        -->
+        <p th:if="${errorMessage}">
+            <span class="error-label">오류 내용: </span>
+            <span th:text="${errorMessage}">오류 메시지</span>
+        </p>
+        <p th:if="${errorDetail}">
+            <span class="error-label">안내: </span>
+            <span th:text="${errorDetail}">상세 안내</span>
+        </p>
+    </div>
+
+    <a class="btn" th:href="@{/products}">← 상품 목록으로 돌아가기</a>
+
+</body>
+</html>
