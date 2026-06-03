@@ -52,5 +52,13 @@
         </div>
     </div>
 </div>
+<footer class="text-center fixed-bottom">
+    <div class="container">
+        <p class="m-0" style="font-size: 0.85rem; letter-spacing: 0.3px;">
+            실습 수행 일시: <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy년 MM월 dd일 (E) a hh:mm:ss')}"></span>
+            │ 학번: 1971271 │ 성명: 백동진
+        </p>
+    </div>
+</footer>
 </body>
 </html>
